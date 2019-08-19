@@ -16,6 +16,7 @@ class Elpa(AutotoolsPackage):
     git = 'https://gitlab.mpcdf.mpg.de/elpa/elpa.git'
 
     version('master', 'master')
+    version('2019.05.001', branch='master')
     version('2018.11.001', branch='ELPA_2018.11.001')
     version('2018.05.001', branch='ELPA_2018.05.001')
     version('2018.05.001.rc1', 'ccd77bd8036988ee624f43c04992bcdd')
