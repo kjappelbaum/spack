@@ -78,7 +78,7 @@ class Elpa(AutotoolsPackage):
 
         spack_env.set('CC', spec['mpi'].mpicc)
         spack_env.set('FC', spec['mpi'].mpifc)
-        # spack_env.set('CXX', spec['mpi'].mpicxx)
+        spack_env.set('CXX', spec['mpi'].mpicxx)
 
         spack_env.append_flags('LDFLAGS', spec['lapack'].libs.search_flags)
         spack_env.append_flags('LIBS', spec['lapack'].libs.link_flags)
@@ -96,9 +96,9 @@ class Elpa(AutotoolsPackage):
         cflags = []
         fflags = []
 
-        fflags.extend(['-O3'])
+        fflags.extend(['-O3', '-march=skylake-avx512'])
         cflags.extend([
-            '-O3', '-funsafe-loop-optimizations',
+            '-O3', '-march=skylake-avx512', '-funsafe-loop-optimizations',
             '-funsafe-math-optimizations', '-ftree-vect-loop-version',
             '-ftree-vectorize', '-enable-option-checking=fatal'
         ])
