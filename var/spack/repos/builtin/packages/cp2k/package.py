@@ -20,27 +20,43 @@ class Cp2k(MakefilePackage):
     git = 'https://github.com/cp2k/cp2k.git'
     list_url = 'https://github.com/cp2k/cp2k/releases'
 
-    version('6.1', sha256='af803558e0a6b9e9d9ce8a3ab955ba32bacd179922455424e061c82c9fefa34b')
-    version('5.1', sha256='e23613b593354fa82e0b8410e17d94c607a0b8c6d9b5d843528403ab09904412')
-    version('4.1', sha256='4a3e4a101d8a35ebd80a9e9ecb02697fb8256364f1eccdbe4e5a85d31fe21343')
-    version('3.0', sha256='1acfacef643141045b7cbade7006f9b7538476d861eeecd9658c9e468dc61151')
+    version('6.1',
+            sha256=
+            'af803558e0a6b9e9d9ce8a3ab955ba32bacd179922455424e061c82c9fefa34b')
+    version('5.1',
+            sha256=
+            'e23613b593354fa82e0b8410e17d94c607a0b8c6d9b5d843528403ab09904412')
+    version('4.1',
+            sha256=
+            '4a3e4a101d8a35ebd80a9e9ecb02697fb8256364f1eccdbe4e5a85d31fe21343')
+    version('3.0',
+            sha256=
+            '1acfacef643141045b7cbade7006f9b7538476d861eeecd9658c9e468dc61151')
     version('develop', branch='master', submodules="True")
 
     variant('mpi', default=True, description='Enable MPI support')
-    variant('blas', default='openblas', values=('openblas', 'mkl', 'accelerate'),
+    variant('blas',
+            default='openblas',
+            values=('openblas', 'mkl', 'accelerate'),
             description='Enable the use of OpenBlas/MKL/Accelerate')
     variant('openmp', default=False, description='Enable OpenMP support')
-    variant('smm', default='libxsmm', values=('libxsmm', 'libsmm', 'blas'),
+    variant('smm',
+            default='libxsmm',
+            values=('libxsmm', 'libsmm', 'blas'),
             description='Library for small matrix multiplications')
     variant('plumed', default=False, description='Enable PLUMED support')
-    variant('libxc', default=True,
+    variant('libxc',
+            default=True,
             description='Support additional functionals via libxc')
-    variant('pexsi', default=False,
+    variant('pexsi',
+            default=False,
             description=('Enable the alternative PEXSI method'
                          'for density matrix evaluation'))
-    variant('elpa', default=False,
+    variant('elpa',
+            default=False,
             description='Enable optimised diagonalisation routines from ELPA')
-    variant('sirius', default=False,
+    variant('sirius',
+            default=False,
             description=('Enable planewave electronic structure'
                          ' calculations via SIRIUS'))
 
@@ -57,7 +73,8 @@ class Cp2k(MakefilePackage):
     depends_on('intel-mkl', when="blas=mkl ~openmp")
     depends_on('intel-mkl threads=openmp', when='blas=mkl +openmp')
 
-    conflicts('blas=accelerate', '+openmp')  # there is no Accelerate with OpenMP support
+    conflicts('blas=accelerate',
+              '+openmp')  # there is no Accelerate with OpenMP support
 
     # require libxsmm-1.11+ since 1.10 can leak file descriptors in Fortran
     depends_on('libxsmm@1.11:~header-only', when='smm=libxsmm')
@@ -66,7 +83,7 @@ class Cp2k(MakefilePackage):
 
     # libint & libxc are always statically linked
     depends_on('libint@1.1.4:1.2', when='@3.0:6.9', type='build')
-    depends_on('libint@2:', when='@7.0:', type='build')
+    depends_on('libint-c2pk', when='@7.0:', type='build')
 
     depends_on('libxc@2.2.2:', when='+libxc@:5.5999', type='build')
     depends_on('libxc@4.0.3:', when='+libxc@6.0:', type='build')
@@ -120,14 +137,12 @@ class Cp2k(MakefilePackage):
     def makefile_version(self):
         return '{prefix}{suffix}'.format(
             prefix='p' if '+mpi' in self.spec else 's',
-            suffix='smp' if '+openmp' in self.spec else 'opt'
-        )
+            suffix='smp' if '+openmp' in self.spec else 'opt')
 
     @property
     def makefile(self):
-        makefile_basename = '.'.join([
-            self.makefile_architecture, self.makefile_version
-        ])
+        makefile_basename = '.'.join(
+            [self.makefile_architecture, self.makefile_version])
         return os.path.join('arch', makefile_basename)
 
     @property
@@ -195,10 +210,15 @@ class Cp2k(MakefilePackage):
             ldflags.insert(0, '-Wl,--allow-multiple-definition')
 
         # linking libint
-        if 'libint@2:' in spec:
-            print(spec['libint'].libs.directories[0]) 
-            libs.extend([' '.join(['-L{}'.format(spec['libint'].libs.directories[0]), '-lint2', '-lstdc++'])])
-            fcflags.append('-I{}'.format(os.path.join(spec['libint'].prefix, "include")))
+        if 'libint-cp2k:' in spec:
+            libs.extend([
+                ' '.join([
+                    '-L{}'.format(spec['libint-cp2k'].libs.directories[0]),
+                    '-lint2', '-lstdc++'
+                ])
+            ])
+            fcflags.append('-I{}'.format(
+                os.path.join(spec['libint-cp2k'].prefix, "include")))
         elif 'libint@1:' in spec:
             libs.extend([
                 os.path.join(spec['libint'].libs.directories[0], 'libderiv.a'),
@@ -218,16 +238,11 @@ class Cp2k(MakefilePackage):
         # Intel
         if '%intel' in self.spec:
             cppflags.extend([
-                '-D__INTEL',
-                '-D__HAS_ISO_C_BINDING',
-                '-D__USE_CP2K_TRACE',
+                '-D__INTEL', '-D__HAS_ISO_C_BINDING', '-D__USE_CP2K_TRACE',
                 '-D__MKL'
             ])
-            fcflags.extend([
-                '-diag-disable 8290,8291,10010,10212,11060',
-                '-free',
-                '-fpp'
-            ])
+            fcflags.extend(
+                ['-diag-disable 8290,8291,10010,10212,11060', '-free', '-fpp'])
 
         # FFTW, LAPACK, BLAS
         lapack = spec['lapack'].libs
@@ -237,10 +252,7 @@ class Cp2k(MakefilePackage):
 
         # MPI
         if '+mpi' in self.spec:
-            cppflags.extend([
-                '-D__parallel',
-                '-D__SCALAPACK'
-            ])
+            cppflags.extend(['-D__parallel', '-D__SCALAPACK'])
 
             scalapack = spec['scalapack'].libs
             ldflags.append(scalapack.search_flags)
@@ -251,38 +263,29 @@ class Cp2k(MakefilePackage):
 
             if 'wannier90' in spec:
                 cppflags.append('-D__WANNIER90')
-                wannier = os.path.join(
-                    spec['wannier90'].libs.directories[0], 'libwannier.a'
-                )
+                wannier = os.path.join(spec['wannier90'].libs.directories[0],
+                                       'libwannier.a')
                 libs.append(wannier)
 
         if '+libxc' in spec:
             libxc = spec['libxc:fortran,static']
-            cppflags += [
-                '-D__LIBXC',
-                libxc.headers.cpp_flags
-            ]
+            cppflags += ['-D__LIBXC', libxc.headers.cpp_flags]
 
             ldflags.append(libxc.libs.search_flags)
             libs.append(str(libxc.libs))
 
         if '+pexsi' in self.spec:
             cppflags.append('-D__LIBPEXSI')
-            fcflags.append('-I' + os.path.join(
-                spec['pexsi'].prefix, 'fortran'))
+            fcflags.append('-I' +
+                           os.path.join(spec['pexsi'].prefix, 'fortran'))
             libs.extend([
-                os.path.join(spec['pexsi'].libs.directories[0],
-                             'libpexsi.a'),
+                os.path.join(spec['pexsi'].libs.directories[0], 'libpexsi.a'),
                 os.path.join(spec['superlu-dist'].libs.directories[0],
                              'libsuperlu_dist.a'),
-                os.path.join(
-                    spec['parmetis'].libs.directories[0],
-                    'libparmetis.{0}'.format(dso_suffix)
-                ),
-                os.path.join(
-                    spec['metis'].libs.directories[0],
-                    'libmetis.{0}'.format(dso_suffix)
-                ),
+                os.path.join(spec['parmetis'].libs.directories[0],
+                             'libparmetis.{0}'.format(dso_suffix)),
+                os.path.join(spec['metis'].libs.directories[0],
+                             'libmetis.{0}'.format(dso_suffix)),
             ])
 
         if '+elpa' in self.spec:
@@ -291,10 +294,11 @@ class Cp2k(MakefilePackage):
             elpa_incdir = elpa.headers.directories[0]
 
             fcflags += ['-I{0}'.format(os.path.join(elpa_incdir, 'modules'))]
-            libs.append(os.path.join(elpa.libs.directories[0],
-                                     ('libelpa{elpa_suffix}.{dso_suffix}'
-                                      .format(elpa_suffix=elpa_suffix,
-                                              dso_suffix=dso_suffix))))
+            libs.append(
+                os.path.join(
+                    elpa.libs.directories[0],
+                    ('libelpa{elpa_suffix}.{dso_suffix}'.format(
+                        elpa_suffix=elpa_suffix, dso_suffix=dso_suffix))))
 
             if spec.satisfies('@:4.999'):
                 if elpa.satisfies('@:2014.5.999'):
@@ -304,9 +308,8 @@ class Cp2k(MakefilePackage):
                 else:
                     cppflags.append('-D__ELPA3')
             else:
-                cppflags.append('-D__ELPA={0}{1:02d}'
-                                .format(elpa.version[0],
-                                        int(elpa.version[1])))
+                cppflags.append('-D__ELPA={0}{1:02d}'.format(
+                    elpa.version[0], int(elpa.version[1])))
                 fcflags += ['-I{0}'.format(os.path.join(elpa_incdir, 'elpa'))]
 
         if self.spec.satisfies('+sirius'):
@@ -323,9 +326,8 @@ class Cp2k(MakefilePackage):
             libs += ['$(shell pkg-config --libs json-fortran)']
 
         if 'smm=libsmm' in spec:
-            lib_dir = os.path.join(
-                'lib', self.makefile_architecture, self.makefile_version
-            )
+            lib_dir = os.path.join('lib', self.makefile_architecture,
+                                   self.makefile_version)
             mkdirp(lib_dir)
             try:
                 copy(env['LIBSMM_PATH'], os.path.join(lib_dir, 'libsmm.a'))
@@ -358,8 +360,7 @@ class Cp2k(MakefilePackage):
             if '+plumed' in self.spec:
                 # Include Plumed.inc in the Makefile
                 mkf.write('include {0}\n'.format(
-                    self.spec['plumed'].package.plumed_inc
-                ))
+                    self.spec['plumed'].package.plumed_inc))
 
             mkf.write('CC = {0.compiler.cc}\n'.format(self))
             if '%intel' in self.spec:
@@ -385,9 +386,8 @@ class Cp2k(MakefilePackage):
             mkf.write('FCFLAGS = {0}\n\n'.format(' '.join(fcflags)))
             mkf.write('LDFLAGS = {0}\n\n'.format(' '.join(ldflags)))
             if '%intel' in spec:
-                mkf.write('LDFLAGS_C = {0}\n\n'.format(
-                    ' '.join(ldflags) + ' -nofor_main')
-                )
+                mkf.write('LDFLAGS_C = {0}\n\n'.format(' '.join(ldflags) +
+                                                       ' -nofor_main'))
             mkf.write('LIBS = {0}\n\n'.format(' '.join(libs)))
             mkf.write('DATA_DIR = {0}\n\n'.format(self.prefix.share.data))
 
