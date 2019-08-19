@@ -95,27 +95,13 @@ class Elpa(AutotoolsPackage):
         # https://packages.qa.debian.org/e/elpa.html
         cflags = []
         fflags = []
-        if '+optflags' in spec:
-            optflags = {
-                'gcc': [
-                    '-O3',
-                    '-march=skylake-avx512',
-                    '-funsafe-loop-optimizations',
-                    '-ftree-vect-loop-version',
-                    '-ftree-vectorize',
-                ],
-                'intel': [
-                    '-O3',
-                    '-ip',
-                ]
-            }
-            cflags.extend(optflags[spec.compiler.name])
-            fflags.extend(optflags[spec.compiler.name])
 
-        if '%intel' in spec:
-            fflags.extend(['-free', '-fpp'])
-        elif '%gcc' in spec:
-            fflags.extend(['-ffree-form', '-ffree-line-length-none', '-cpp'])
+        fflags.extend(['-O3', '-march=skylake-avx512'])
+        cflags.extend([
+            '-O3', '-march=skylake-avx512', '-funsafe-loop-optimizations',
+            '-ftree-vect-loop-version', '-ftree-vectorize',
+            '-enable-option-checking=fatal'
+        ])
 
         math_libs = (spec['scalapack'].libs + spec['lapack'].libs +
                      spec['blas'].libs)
