@@ -99,6 +99,7 @@ class Elpa(AutotoolsPackage):
             optflags = {
                 'gcc': [
                     '-O3',
+                    '-march=skylake-avx512',
                     '-funsafe-loop-optimizations',
                     '-ftree-vect-loop-version',
                     '-ftree-vectorize',
