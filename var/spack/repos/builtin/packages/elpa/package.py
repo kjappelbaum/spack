@@ -99,9 +99,8 @@ class Elpa(AutotoolsPackage):
         fflags.extend(['-O3', '-march=skylake-avx512'])
         cflags.extend([
             '-O3', '-march=skylake-avx512', '-funsafe-loop-optimizations',
-            '-funsafe-math-optimizations'
-            '-ftree-vect-loop-version', '-ftree-vectorize',
-            '-enable-option-checking=fatal'
+            '-funsafe-math-optimizations', '-ftree-vect-loop-version',
+            '-ftree-vectorize', '-enable-option-checking=fatal'
         ])
 
         math_libs = (spec['scalapack'].libs + spec['lapack'].libs +
