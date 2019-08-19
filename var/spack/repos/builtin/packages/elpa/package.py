@@ -13,7 +13,7 @@ class Elpa(AutotoolsPackage):
 
     homepage = 'http://elpa.mpcdf.mpg.de/'
     url = 'http://elpa.mpcdf.mpg.de/elpa-2015.11.001.tar.gz'
-    git = 'https://gitlab.mpcdf.mpg.de/elpa/elpa'
+    git = 'https://gitlab.mpcdf.mpg.de/elpa/elpa.git'
 
     version('master', 'master')
     version('2018.11.001', branch='ELPA_2018.11.001')
