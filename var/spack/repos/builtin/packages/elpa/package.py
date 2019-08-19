@@ -103,14 +103,8 @@ class Elpa(AutotoolsPackage):
             '-ftree-vectorize', '-enable-option-checking=fatal'
         ])
 
-        math_libs = (spec['scalapack'].libs + spec['lapack'].libs +
-                     spec['blas'].libs)
-
-        options.extend([
-            'FCFLAGS=' + ' '.join(fflags),
-            'CFLAGS=' + ' '.join(cflags),
-            'SCALAPACK_LDFLAGS=' + math_libs.joined(),
-        ])
+        options.extend(
+            ['FCFLAGS=' + ' '.join(fflags), 'CFLAGS=' + ' '.join(cflags)])
 
         if '+openmp' in spec:
             options.append('--enable-openmp')
