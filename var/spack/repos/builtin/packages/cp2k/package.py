@@ -78,7 +78,7 @@ class Cp2k(MakefilePackage):
 
     # require libxsmm-1.11+ since 1.10 can leak file descriptors in Fortran
     depends_on('libxsmm@1.11:~header-only', when='smm=libxsmm')
-    # use pkg-config (support added in libxsmm-1.10) to link to libxsmm
+    # use pkg-config (supplibiort added in libxsmm-1.10) to link to libxsmm
     depends_on('pkgconfig', type='build', when='smm=libxsmm')
 
     # libint & libxc are always statically linked
@@ -210,7 +210,7 @@ class Cp2k(MakefilePackage):
             ldflags.insert(0, '-Wl,--allow-multiple-definition')
 
         # linking libint
-        if 'libint-cp2k:' in spec:
+        if 'libint-cp2k' in spec:
             libs.extend([
                 ' '.join([
                     '-L{}'.format(spec['libint-cp2k'].libs.directories[0]),
