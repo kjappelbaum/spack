@@ -13,9 +13,13 @@ class Elpa(AutotoolsPackage):
 
     homepage = 'http://elpa.mpcdf.mpg.de/'
     url = 'http://elpa.mpcdf.mpg.de/elpa-2015.11.001.tar.gz'
+    git = 'https://gitlab.mpcdf.mpg.de/elpa/elpa'
 
+    version('master', 'master')
+    version('2018.11.001', branch='ELPA_2018.11.001')
+    version('2018.05.001', branch='ELPA_2018.05.001')
     version('2018.05.001.rc1', 'ccd77bd8036988ee624f43c04992bcdd')
-    version('2017.11.001', '4a437be40cc966efb07aaab84c20cd6e', preferred=True)
+    version('2017.11.001', '4a437be40cc966efb07aaab84c20cd6e')
     version('2017.05.003', '7c8e5e58cafab212badaf4216695700f')
     version('2017.05.002', 'd0abc1ac1f493f93bf5e30ec8ab155dc')
     version('2016.11.001.pre', '5656fd066cf0dcd071dbcaf20a639b37')
@@ -24,7 +28,9 @@ class Elpa(AutotoolsPackage):
     version('2015.11.001', 'de0f35b7ee7c971fd0dca35c900b87e6')
 
     variant('openmp', default=False, description='Activates OpenMP support')
-    variant('optflags', default=True, description='Build with optimization flags')
+    variant('optflags',
+            default=True,
+            description='Build with optimization flags')
 
     depends_on('mpi')
     depends_on('blas')
@@ -41,17 +47,18 @@ class Elpa(AutotoolsPackage):
     @property
     def libs(self):
         libname = 'libelpa_openmp' if '+openmp' in self.spec else 'libelpa'
-        return find_libraries(
-            libname, root=self.prefix, shared=True, recursive=True
-        )
+        return find_libraries(libname,
+                              root=self.prefix,
+                              shared=True,
+                              recursive=True)
 
     @property
     def headers(self):
         suffix = '_openmp' if self.spec.satisfies('+openmp') else ''
         incdir = os.path.join(
             self.spec.prefix.include,
-            'elpa{suffix}-{version!s}'.format(
-                suffix=suffix, version=self.spec.version))
+            'elpa{suffix}-{version!s}'.format(suffix=suffix,
+                                              version=self.spec.version))
 
         hlist = find_all_headers(incdir)
         hlist.directories = [incdir]

@@ -91,9 +91,9 @@ class Cp2k(MakefilePackage):
     depends_on('mpi@2:', when='+mpi')
     depends_on('scalapack', when='+mpi')
     depends_on('elpa@2011.12:2016.13+openmp', when='+openmp+elpa@:5.999')
-    depends_on('elpa@2011.12:2017.11+openmp', when='+openmp+elpa@6.0:')
+    depends_on('elpa@2011.12:2018.11.001+openmp', when='+openmp+elpa@6.0:')
     depends_on('elpa@2011.12:2016.13~openmp', when='~openmp+elpa@:5.999')
-    depends_on('elpa@2011.12:2017.11~openmp', when='~openmp+elpa@6.0:')
+    depends_on('elpa@2011.12:2018.11.001~openmp', when='~openmp+elpa@6.0:')
     depends_on('plumed+shared+mpi', when='+plumed+mpi')
     depends_on('plumed+shared~mpi', when='+plumed~mpi')
 
