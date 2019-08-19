@@ -211,12 +211,7 @@ class Cp2k(MakefilePackage):
 
         # linking libint
         if 'libint-cp2k' in spec:
-            libs.extend([
-                ' '.join([
-                    '-L{}'.format(spec['libint-cp2k'].libs), '-lint2',
-                    '-lstdc++'
-                ])
-            ])
+            libs.extend([' '.join(['-L{}'.format(spec['libint-cp2k'].libs)])])
             fcflags.append('-I{}'.format(
                 os.path.join(spec['libint-cp2k'].prefix, "include")))
         elif 'libint@1:' in spec:
