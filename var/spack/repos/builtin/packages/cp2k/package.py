@@ -213,8 +213,8 @@ class Cp2k(MakefilePackage):
         if 'libint-cp2k' in spec:
             libs.extend([
                 ' '.join([
-                    '-L{}'.format(spec['libint-cp2k'].libs.directories[0]),
-                    '-lint2', '-lstdc++'
+                    '-L{}'.format(spec['libint-cp2k'].libs), '-lint2',
+                    '-lstdc++'
                 ])
             ])
             fcflags.append('-I{}'.format(
