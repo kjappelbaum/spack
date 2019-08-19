@@ -96,9 +96,9 @@ class Elpa(AutotoolsPackage):
         cflags = []
         fflags = []
 
-        fflags.extend(['-O3', '-march=skylake-avx512'])
+        fflags.extend(['-O3'])
         cflags.extend([
-            '-O3', '-march=skylake-avx512', '-funsafe-loop-optimizations',
+            '-O3', '-funsafe-loop-optimizations',
             '-funsafe-math-optimizations', '-ftree-vect-loop-version',
             '-ftree-vectorize', '-enable-option-checking=fatal'
         ])
