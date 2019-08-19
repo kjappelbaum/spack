@@ -25,3 +25,20 @@ class LibintCp2k(CMakePackage):
 
     def cmake_args(self):
         return ['-DENABLE_FORTRAN=ON']
+
+    @property
+    def libs(self):
+        for dir in ['lib']:
+            if self.version > Version('1.9.9'):
+                libs = find_libraries('libint2',
+                                      join_path(self.prefix, dir),
+                                      shared=True,
+                                      recursive=False)
+            else:
+                libs = find_libraries('libint',
+                                      join_path(self.prefix, dir),
+                                      shared=True,
+                                      recursive=False)
+            if libs:
+                return libs
+        return None
